@@ -3,8 +3,14 @@ package rocks.tauonmusicbox.tauonremote
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.widget.Toast
 import com.google.gson.GsonBuilder
 import okhttp3.*
+import okio.BufferedSink
+import okio.Okio
+import okio.buffer
+import okio.sink
+import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -14,6 +20,9 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     var activePlaylistViewing: String = ""
     var activePlaylistPlaying: String = ""
     var mode = 1
+    //var cachedFile: ByteString
+
+    var cachedFileID = -1
 
     val mediaPlayer = MediaPlayer()
     val dummy_track = TauonTrack()
@@ -65,13 +74,59 @@ class Controller(val activity: MainActivity, val settings: Settings) {
             activity.fetchStatus()
         } else if (mode == 2){
             if (tauonStatus.track.duration > 1) {
-                mediaPlayer.seekTo((tauonStatus.track.duration * (progress / 1000f)).toInt())
-                activity.fetchStatus()
+
+                if (cachedFileID != tauonStatus.track.id && false){
+                    // Re-download entire file
+//                    mediaPlayer.reset()
+//                    val base_url = "http://${settings.ip_address}:7814/api1/file/${tauonStatus.track.id}"
+//                    val request = Request.Builder().url(base_url).build()
+//                    val client = OkHttpClient()
+//                    client.newCall(request).enqueue(object : Callback {
+//                        override fun onFailure(call: Call, e: IOException) {
+//                            println("Command failed")
+//                        }
+//                        override fun onResponse(call: Call, response: Response) {
+//
+//                            activity.runOnUiThread {
+//                                Toast.makeText(activity, "Buffering... Please wait", Toast.LENGTH_SHORT).show()
+//                            }
+//
+//                            val downloadedFile = File(activity.cacheDir, "audiofile")
+//                            val sink: BufferedSink = downloadedFile.sink().buffer()
+//                            response.body?.source()?.let { sink.writeAll(it) }
+//                            sink.close()
+//                            println("download DONE")
+//                            println(downloadedFile.length())
+//                            cachedFileID = tauonStatus.track.id
+//
+//
+//                            println("Command sent")
+//                            //cachedFile = response.body.byteString()
+//                            response.body?.close()
+//                            //reload_tracks()
+//                            activity.runOnUiThread {
+//
+//
+//                                mediaPlayer.setDataSource(downloadedFile.absolutePath)
+//                                mediaPlayer.setOnCompletionListener {  }
+//                                mediaPlayer.prepare()
+//                                mediaPlayer.seekTo((tauonStatus.track.duration * (progress / 1000f)).toInt())
+//                                mediaPlayer.start()
+//                            }
+//
+//                        }
+//                    })
+
+                } else {
+                    mediaPlayer.seekTo((tauonStatus.track.duration * (progress / 1000f)).toInt())
+                    activity.fetchStatus()
+                }
+
             }
         }
     }
 
-    fun hitApi(text: String, callback: (()->Unit)? = null){
+    fun hitApi(text: String, callback: (() -> Unit)? = null){
 
         if (settings.ip_address.isBlank()){
             return
@@ -80,7 +135,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
         val base_url = "http:///${settings.ip_address}:7814/api1/$text"
         val request = Request.Builder().url(base_url).build()
         val client = OkHttpClient()
-        client.newCall(request).enqueue(object: Callback {
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 println("Command failed")
             }
@@ -118,6 +173,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
             playerPaused = false
             mediaPlayer.reset()
             val url: Uri = Uri.parse("http://${settings.ip_address}:7814/api1/file/${track.id}")
+            //val url: Uri = Uri.parse("http://${settings.ip_address}:7814/api1/stream/${track.id}")
             mediaPlayer.setDataSource(activity, url)
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
             mediaPlayer.prepareAsync()
