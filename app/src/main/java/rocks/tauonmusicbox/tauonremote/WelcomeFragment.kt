@@ -7,9 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Switch
 import android.widget.Toast
 
-class WelcomeFragment(private val settings: Settings, val activity: MainActivity) : Fragment() {
+class WelcomeFragment(private val settings: Settings, val controller: Controller, val activity: MainActivity) : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,12 +24,21 @@ class WelcomeFragment(private val settings: Settings, val activity: MainActivity
 
         val ipEntry: EditText = view.findViewById(R.id.ipAddressText)
         val ipButton: Button = view.findViewById(R.id.setIPButton)
+        val streamSwitch: Switch = view.findViewById(R.id.streamModeSwitch)
+
         ipEntry.setText(settings.ip_address)
         ipButton.setOnClickListener {
             settings.set_ip(ipEntry.text.toString())
             Toast.makeText(activity, "Saved setting", Toast.LENGTH_SHORT).show()
         }
 
+        streamSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                controller.setStreamMode()
+            } else {
+                controller.setRemoteMode()
+            }
+        }
         return view
     }
 

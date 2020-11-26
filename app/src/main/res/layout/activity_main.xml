@@ -107,7 +107,9 @@
         android:layout_height="wrap_content"
         android:text=""
         tools:text="Title"
+        android:textSize="15sp"
         android:layout_marginTop="5dp"
+        android:layout_marginStart="2dp"
         app:layout_constraintStart_toStartOf="@id/artFrame"
         app:layout_constraintTop_toBottomOf="@+id/artFrame" />
 
@@ -116,31 +118,46 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
+        android:textColor="@color/main_artist_text"
+        android:layout_marginTop="1dp"
+        android:textSize="13sp"
         tools:text="Artist"
         app:layout_constraintTop_toBottomOf="@+id/titleTextView"
         app:layout_constraintStart_toStartOf="@+id/titleTextView" />
-
-    <TextView
-        android:id="@+id/albumTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        tools:text="Album"
-        app:layout_constraintStart_toStartOf="@id/artistTextView"
-        app:layout_constraintTop_toBottomOf="@+id/artistTextView" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/mainSlider"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="8dp"
         android:background="@color/pager_background"
+        app:layout_constraintTop_toBottomOf="@id/seekBar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/albumTextView" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="0dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginStart="2dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/artistTextView"
+        app:layout_constraintEnd_toStartOf="@id/progressTime"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/progressTime"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        tools:text = "12:43"
+        app:layout_constraintStart_toEndOf="@id/seekBar"
+        app:layout_constraintTop_toTopOf="@id/seekBar"
+        app:layout_constraintBottom_toBottomOf="@id/seekBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

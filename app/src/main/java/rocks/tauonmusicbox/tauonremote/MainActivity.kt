@@ -1,27 +1,22 @@
 package rocks.tauonmusicbox.tauonremote
 
-import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.ImageView
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.viewpager.widget.ViewPager
 import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
 import okhttp3.*
+import org.w3c.dom.Text
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
     val picasso = Picasso.get()
-    val mediaPlayer = MediaPlayer()
-
-    val dummy_track = TauonTrack("", "", "", "", 0, -1)
-
-    var tauonStatus = TauonStatus("stopped",
-            false, false, 0, "", 0, 0, dummy_track)
 
     var tracks = mutableListOf<TauonTrack>()
     var playlists = mutableListOf<TauonPlaylist>()
@@ -39,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var playButton: ImageView
     lateinit var nextButton: ImageView
     lateinit var backButton: ImageView
+    lateinit var seekBar: SeekBar
+    lateinit var timeProgress: TextView
 
     lateinit var pager: ViewPager
     lateinit var welcomeFragment: WelcomeFragment
@@ -68,12 +65,34 @@ class MainActivity : AppCompatActivity() {
         playButton = findViewById(R.id.playButton)
         nextButton = findViewById(R.id.nextButton)
         backButton = findViewById(R.id.backButton)
+        timeProgress = findViewById(R.id.progressTime)
+
+        class SeekListener(): SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                if (seekBar != null) {
+                    controller.seekClick(seekBar.progress)
+                }
+            }
+
+        }
+        val seekListener = SeekListener()
+
+        seekBar = findViewById(R.id.seekBar)
+        seekBar.max = 1000
+        seekBar.setOnSeekBarChangeListener(seekListener)
 
         playButton.setOnClickListener {
-            playPauseSend()
+            //playPauseSend()
+            controller.playButtonClick()
         }
         nextButton.setOnClickListener {
-            nextSend()
+            controller.nextButtonClick()
         }
         backButton.setOnClickListener {
             backSend()
@@ -88,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
         val adapter = ViewPagerAdapter(supportFragmentManager)
 
-        welcomeFragment = WelcomeFragment(settings, this)
+        welcomeFragment = WelcomeFragment(settings, controller, this)
         playlistListFragment = PlaylistFragment(playlists, controller)
         albumListFragment = AlbumListFragment(albums, controller)
         trackListFragment = TrackListFragment(tracks, controller)
@@ -132,22 +151,22 @@ class MainActivity : AppCompatActivity() {
     fun updateStatus() {
 
         val titleText: TextView = findViewById(R.id.titleTextView)
-        titleText.text = tauonStatus.track.title
+        titleText.text = controller.tauonStatus.track.title
 
         val artistText: TextView = findViewById(R.id.artistTextView)
-        artistText.text = tauonStatus.track.artist
+        artistText.text = controller.tauonStatus.track.artist
 
-        val albumText: TextView = findViewById(R.id.albumTextView)
-        albumText.text = tauonStatus.track.album
+        //val albumText: TextView = findViewById(R.id.albumTextView)
+        //albumText.text = controller.tauonStatus.track.album
 
         val picture: ImageView = findViewById(R.id.mainAlbumArt)
 
         if (settings.ip_address.isNotBlank()) {
-            picasso.load("http://${settings.ip_address}:7814/api1/pic/medium/" + tauonStatus.track.id)
+            picasso.load("http://${settings.ip_address}:7814/api1/pic/medium/" + controller.tauonStatus.track.id)
                 .into(picture)
         }
 
-        if (tauonStatus.status == "playing") {
+        if (controller.tauonStatus.status == "playing") {
             playButton.setBackgroundResource(R.drawable.ic_pause)
         } else {
             playButton.setBackgroundResource(R.drawable.ic_play_arrow)
@@ -156,41 +175,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
-    fun nextSend() {
-        controller.hitApi("next")
-        fetchStatus()
-    }
 
     fun backSend() {
         controller.hitApi("back")
         fetchStatus()
     }
 
-    fun playPauseSend() {
-
-        if (tauonStatus.status == "playing") {
-            tauonStatus.status = "paused"
-            playButton.setBackgroundResource(R.drawable.ic_play_arrow)
-            controller.hitApi("pause")
-
-
-        } else {
-            tauonStatus.status = "playing"
-            //tracks.add(TauonTrack("wowow", "wt", "", 2))
-            trackListFragment.update()
-            playButton.setBackgroundResource(R.drawable.ic_pause)
-            controller.hitApi("play")
-//            val url: Uri = Uri.parse("http://192.168.1.12:7814/api1/file/${tauonStatus.id}")
-//            mediaPlayer.setDataSource(this, url)
-//            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
-//            mediaPlayer.prepare() //don't use prepareAsync for mp3 playback
-//            mediaPlayer.start()
-//            println("DONE play")
-
-
-        }
-    }
 
     fun fetchTrackList(playlistId: String, album_id: Int, go_to_tracks: Boolean = false) {
 
@@ -273,7 +263,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun fetchStatus() {
-        if (settings.ip_address.isBlank()){
+        if (controller.mode == 2 && controller.mediaPlayer.isPlaying) {
+            if (controller.tauonStatus.track.duration > 1){
+                controller.tauonStatus.progress = controller.mediaPlayer.currentPosition
+
+                runOnUiThread {
+                    println(controller.tauonStatus.progress)
+                    println(controller.getFormattedProgress())
+                    timeProgress.text = controller.getFormattedProgress()
+                    seekBar.setProgress(
+                            controller.getProgress1k(),
+                            false)
+                }
+            }
+
+        }
+
+        if (settings.ip_address.isBlank() || controller.mode != 1){
             return
         }
         // Get playlists
@@ -326,21 +332,25 @@ class MainActivity : AppCompatActivity() {
                 println(body)
 
                 val gson = GsonBuilder().create()
-                tauonStatus = gson.fromJson(body, TauonStatus::class.java)
+                controller.tauonStatus = gson.fromJson(body, controller.tauonStatus::class.java)
 
 
-                if (!got_albums && tauonStatus.playlist.isNotEmpty()) {
-                    fetchAlbums(tauonStatus.playlist)
+                if (!got_albums && controller.tauonStatus.playlist.isNotEmpty()) {
+                    fetchAlbums(controller.tauonStatus.playlist)
                     got_albums = true
-                    controller.active_playlist = tauonStatus.playlist
+                    controller.activePlaylistViewing = controller.tauonStatus.playlist
 
                 }
                 if (!got_tracks) {
-                    fetchTrackList(tauonStatus.playlist, tauonStatus.album_id)
+                    fetchTrackList(controller.tauonStatus.playlist, controller.tauonStatus.album_id)
                     got_tracks = true
                 }
 
                 runOnUiThread {
+                    timeProgress.text = controller.getFormattedProgress()
+                    seekBar.setProgress(
+                            controller.getProgress1k(),
+                            false)
                     updateStatus()
                 }
             }

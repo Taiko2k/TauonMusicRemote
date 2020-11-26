@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class MyAdapter(private val tracks: List<TauonTrack>, private val clickHandler: (TauonTrack) -> Unit) :
+class MyAdapter(private val tracks: List<TauonTrack>, private val controller: Controller, private val clickHandler: (TauonTrack) -> Unit) :
     RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
     /**
@@ -58,6 +58,15 @@ class MyAdapter(private val tracks: List<TauonTrack>, private val clickHandler: 
             )
         }
 
+        if (controller.tauonStatus.track.id == tracks[position].id) {
+            viewHolder.itemHolder.setBackgroundColor(
+                    ContextCompat.getColor(
+                            context,
+                            R.color.list_item_playing
+                    )
+            )
+        }
+
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         viewHolder.textView.text = tracks[position].title
@@ -86,7 +95,7 @@ class TrackListFragment(val tracks: List<TauonTrack>, val controller: Controller
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_track_list, container, false)
-        adapter = MyAdapter(tracks) {
+        adapter = MyAdapter(tracks, controller) {
             controller.startTrack(it)
         }
         val rcview: RecyclerView = view.findViewById(R.id.trackListRecycler)

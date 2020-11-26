@@ -12,8 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Welcome to the Tauon Music Remote app!
-\nCopyright © 2020, Taiko2k captain(dot)gxj(at)gmail.com
-\nThis app in is beta so expect bugs and crashes.
+\nCopyright © 2020, Taiko2k captain.gxj@gmail.com
 \n\nTo get started, enter the IP address of your local computer running Tauon Music Box. (E.g. 192.168.1.2)"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +22,7 @@
         android:id="@+id/ipAddressText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="IP/Hostname"
         android:inputType="number|textPersonName|numberDecimal"
@@ -44,10 +43,20 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="42dp"
         android:text="Then, swipe -> to select from playlists, albums then tracks."
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/setIPButton" />
+
+    <Switch
+        android:id="@+id/streamModeSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Stream Mode"
+        app:layout_constraintBottom_toBottomOf="@+id/setIPButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/setIPButton" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

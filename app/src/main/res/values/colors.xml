@@ -12,9 +12,12 @@
     <color name="control_button_bg">#CDCDCD</color>
     <color name="art_border_colour">#3E3E3E</color>
 
+    <color name="main_artist_text">#6A6A6A</color>
+
     <color name="pager_background">#131313</color>
     <color name="list_item_primary">#131313</color>
     <color name="list_item_alt">#191919</color>
+    <color name="list_item_playing">#252525</color>
 
 
 </resources>

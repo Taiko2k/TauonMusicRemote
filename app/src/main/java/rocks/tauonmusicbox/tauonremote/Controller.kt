@@ -1,12 +1,75 @@
 package rocks.tauonmusicbox.tauonremote
 
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.net.Uri
+import com.google.gson.GsonBuilder
 import okhttp3.*
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 
 class Controller(val activity: MainActivity, val settings: Settings) {
 
-    var active_playlist: String = ""
+    var activePlaylistViewing: String = ""
+    var activePlaylistPlaying: String = ""
+    var mode = 1
+
+    val mediaPlayer = MediaPlayer()
+    val dummy_track = TauonTrack()
+    var tauonStatus = TauonStatus("stopped",
+            false, false, 0, "", 0, 0, dummy_track)
+    var playerPaused = false
+
+
+    fun setStreamMode(){
+        if (mode != 2) {
+            mode = 2
+            resetStatus()
+        }
+    }
+
+    fun setRemoteMode(){
+        if (mode != 1){
+            mode = 1
+            resetStatus()
+        }
+    }
+
+    fun resetStatus(){
+        tauonStatus.track = dummy_track
+        activity.seekBar.progress = 0
+        activity.timeProgress.text = "00:00"
+        activity.updateStatus()
+    }
+
+    fun getProgress1k(): Int {
+        if (tauonStatus.track.duration < 1) {
+            return 0
+        }
+        return ((tauonStatus.progress / tauonStatus.track.duration.toDouble()) * 1000).toInt()
+    }
+
+    fun getFormattedProgress(): String {
+        val millis = tauonStatus.progress.toLong()
+        return String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(millis),
+                TimeUnit.MILLISECONDS.toSeconds(millis) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
+        )
+    }
+
+    fun seekClick(progress: Int) {
+        if (mode == 1) {
+            hitApi("seek1k/$progress")
+            activity.fetchStatus()
+        } else if (mode == 2){
+            if (tauonStatus.track.duration > 1) {
+                mediaPlayer.seekTo((tauonStatus.track.duration * (progress / 1000f)).toInt())
+                activity.fetchStatus()
+            }
+        }
+    }
 
     fun hitApi(text: String, callback: (()->Unit)? = null){
 
@@ -34,8 +97,119 @@ class Controller(val activity: MainActivity, val settings: Settings) {
         })
     }
 
+    fun syncTauonStatus(track: TauonTrack){
+        tauonStatus.track = track
+        tauonStatus.position = track.position
+        tauonStatus.progress = 0
+        activity.trackListFragment.update()
+
+    }
+
     fun startTrack(track: TauonTrack){
-        playPosition(track.position, active_playlist)
+        if (mode == 1) {
+            playPosition(track.position, activePlaylistViewing)
+        } else if (mode == 2) {
+
+            mediaPlayer.setOnPreparedListener {
+                it.start()
+                activity.playButton.setBackgroundResource(R.drawable.ic_pause)
+                tauonStatus.status = "playing"
+            }
+            playerPaused = false
+            mediaPlayer.reset()
+            val url: Uri = Uri.parse("http://${settings.ip_address}:7814/api1/file/${track.id}")
+            mediaPlayer.setDataSource(activity, url)
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
+            mediaPlayer.prepareAsync()
+            mediaPlayer.setOnCompletionListener {
+                next()
+            }
+            activePlaylistPlaying = activePlaylistViewing
+            syncTauonStatus(track)
+            activity.updateStatus()
+            println("DONE play")
+        }
+    }
+
+    fun playButtonClick(){
+        if (mode == 1){
+            playPauseSend()
+        } else if (mode == 2){
+            playPause()
+        }
+    }
+
+    fun nextButtonClick(){
+        if (mode == 1){
+            nextSend()
+        } else if (mode == 2) {
+            next()
+        }
+    }
+
+    fun next(){
+        tauonStatus.position += 1
+        var newTrack = TauonTrack()
+        val base_url = "http:///${settings.ip_address}:7814/api1/trackposition/$activePlaylistPlaying/${tauonStatus.position}"
+        val request = Request.Builder().url(base_url).build()
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                println("Request track failed")
+                println(e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string()
+                response.body?.close()
+                println("Got request track")
+                println(body)
+
+                val gson = GsonBuilder().create()
+
+                activity.runOnUiThread {
+                    println("NEXT TRACK...")
+                    newTrack = gson.fromJson(body, TauonTrack::class.java)
+                    tauonStatus.status = "playing"
+                    startTrack(newTrack)
+                }
+            }
+        })
+
+    }
+
+    fun nextSend() {
+        hitApi("next")
+        activity.fetchStatus()
+    }
+
+    fun playPause() {
+
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+            playerPaused = true
+            activity.playButton.setBackgroundResource(R.drawable.ic_play_arrow)
+        } else if (playerPaused) {
+            mediaPlayer.start()
+            playerPaused = false
+            activity.playButton.setBackgroundResource(R.drawable.ic_pause)
+        }
+
+    }
+
+    fun playPauseSend() {
+
+        if (tauonStatus.status == "playing") {
+            tauonStatus.status = "paused"
+            activity.playButton.setBackgroundResource(R.drawable.ic_play_arrow)
+            hitApi("pause")
+
+        } else {
+            tauonStatus.status = "playing"
+            activity.trackListFragment.update()
+            activity.playButton.setBackgroundResource(R.drawable.ic_pause)
+            hitApi("play")
+        }
     }
 
     fun playPosition(position: Int, playlist: String){
@@ -46,13 +220,13 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     }
 
     fun changePlaylist(playlist: TauonPlaylist){
-        active_playlist = playlist.id
-        activity.fetchAlbums(active_playlist, true)
+        activePlaylistViewing = playlist.id
+        activity.fetchAlbums(activePlaylistViewing, true)
     }
 
     fun loadTracks(track: TauonTrack){
         // click an album to load its tracks
-        activity.fetchTrackList(active_playlist, track.position, true)
+        activity.fetchTrackList(activePlaylistViewing, track.position, true)
 
 
     }
