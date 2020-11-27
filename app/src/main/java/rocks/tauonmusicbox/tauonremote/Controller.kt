@@ -20,6 +20,8 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     var activePlaylistViewing: String = ""
     var activePlaylistPlaying: String = ""
     var mode = 1
+
+    var repeat = 0
     //var cachedFile: ByteString
 
     var cachedFileID = -1
@@ -66,6 +68,25 @@ class Controller(val activity: MainActivity, val settings: Settings) {
                 TimeUnit.MILLISECONDS.toSeconds(millis) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
         )
+    }
+
+    fun clickRepeat() {
+
+        if (mode == 1) {
+            Toast.makeText(activity, "Sorry, not yet implemented for REMOTE mode", Toast.LENGTH_SHORT).show()
+        } else {
+            toggleRepeat()
+        }
+    }
+
+    fun toggleRepeat(){
+        if (repeat == 0){
+            repeat = 1
+            activity.repeatButton.setBackgroundResource(R.drawable.ic_repeat)
+        } else if (repeat == 1) {
+            repeat = 0
+            activity.repeatButton.setBackgroundResource(R.drawable.ic_repeat_off)
+        }
     }
 
     fun seekClick(progress: Int) {
@@ -178,13 +199,23 @@ class Controller(val activity: MainActivity, val settings: Settings) {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
             mediaPlayer.prepareAsync()
             mediaPlayer.setOnCompletionListener {
-                next()
+                endOfTrackAction()
             }
             activePlaylistPlaying = activePlaylistViewing
             syncTauonStatus(track)
+            activity.seekBar.progress = 0
             activity.updateStatus()
             println("DONE play")
         }
+    }
+
+    fun endOfTrackAction(){
+        if (repeat == 1) {
+            startTrack(tauonStatus.track)
+            return
+        }
+
+        next()
     }
 
     fun playButtonClick(){

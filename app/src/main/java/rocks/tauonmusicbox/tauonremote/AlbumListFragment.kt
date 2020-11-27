@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
-class AlbumListAdapter(private val items: List<TauonTrack>, private val clickHandler: (TauonTrack) -> Unit) :
+class AlbumListAdapter(private val items: List<TauonTrack>, val settings: Settings, private val clickHandler: (TauonTrack) -> Unit) :
         RecyclerView.Adapter<AlbumListAdapter.ViewHolder>() {
 
     /**
@@ -71,7 +71,7 @@ class AlbumListAdapter(private val items: List<TauonTrack>, private val clickHan
         viewHolder.textView.text = items[position].album
         viewHolder.albumArtistView.text = items[position].album_artist
 
-        picasso.load("http://192.168.1.12:7814/api1/pic/small/" + items[position].id)
+        picasso.load("http://${settings.ip_address}:7814/api1/pic/small/" + items[position].id)
             .into(viewHolder.albumArt)
 
         viewHolder.itemView.setOnClickListener {
@@ -84,7 +84,7 @@ class AlbumListAdapter(private val items: List<TauonTrack>, private val clickHan
 
 }
 
-class AlbumListFragment(val items: List<TauonTrack>, val controller: Controller) : Fragment() {
+class AlbumListFragment(val items: List<TauonTrack>, val controller: Controller, val settings: Settings) : Fragment() {
 
     var ready = false
     lateinit var adapter: AlbumListAdapter
@@ -98,7 +98,7 @@ class AlbumListFragment(val items: List<TauonTrack>, val controller: Controller)
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_album_list, container, false)
-        adapter = AlbumListAdapter(items) {
+        adapter = AlbumListAdapter(items, settings) {
             //controller.startTrack(it)
             controller.loadTracks(it)
         }

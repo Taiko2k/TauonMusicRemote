@@ -1,62 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".WelcomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome to the Tauon Music Remote app!
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <!-- TODO: Update blank fragment layout -->
+        <TextView
+            android:id="@+id/textWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to the Tauon Music Remote app!
 \nCopyright © 2020, Taiko2k captain.gxj@gmail.com
 \n\nTo get started, enter the IP address of your local computer running Tauon Music Box. (E.g. 192.168.1.2)"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/ipAddressText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="IP/Hostname"
-        android:inputType="number|textPersonName|numberDecimal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <Button
-        android:id="@+id/setIPButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Set"
-        app:layout_constraintEnd_toEndOf="@+id/ipAddressText"
-        app:layout_constraintStart_toStartOf="@+id/ipAddressText"
-        app:layout_constraintTop_toBottomOf="@+id/ipAddressText" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="42dp"
-        android:text="Then, swipe -> to select from playlists, albums then tracks."
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/setIPButton" />
-
-    <Switch
-        android:id="@+id/streamModeSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Stream Mode"
-        app:layout_constraintBottom_toBottomOf="@+id/setIPButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/setIPButton" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Then, swipe -> to select from playlists, albums then tracks."
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/streamModeSwitch" />
+
+        <Switch
+            android:id="@+id/streamModeSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stream Mode"
+            android:layout_marginTop="18dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ipSettingsLayout" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ipSettingsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@id/textWelcome"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            >
+
+
+            <EditText
+                android:id="@+id/ipAddressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="8"
+                android:hint="IP/Hostname"
+                android:inputType="number|textPersonName|numberDecimal"
+                app:layout_constraintEnd_toStartOf="@id/setIPButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <Button
+                android:id="@+id/setIPButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="Set"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ipAddressText"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</ScrollView>

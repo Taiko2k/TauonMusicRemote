@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var playButton: ImageView
     lateinit var nextButton: ImageView
     lateinit var backButton: ImageView
+    lateinit var repeatButton: ImageView
     lateinit var seekBar: SeekBar
     lateinit var timeProgress: TextView
 
@@ -65,7 +66,12 @@ class MainActivity : AppCompatActivity() {
         playButton = findViewById(R.id.playButton)
         nextButton = findViewById(R.id.nextButton)
         backButton = findViewById(R.id.backButton)
+        repeatButton = findViewById(R.id.repeatButton)
         timeProgress = findViewById(R.id.progressTime)
+
+        repeatButton.setOnClickListener {
+            controller.clickRepeat()
+        }
 
         class SeekListener(): SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -109,7 +115,7 @@ class MainActivity : AppCompatActivity() {
 
         welcomeFragment = WelcomeFragment(settings, controller, this)
         playlistListFragment = PlaylistFragment(playlists, controller)
-        albumListFragment = AlbumListFragment(albums, controller)
+        albumListFragment = AlbumListFragment(albums, controller, settings)
         trackListFragment = TrackListFragment(tracks, controller)
 
 
