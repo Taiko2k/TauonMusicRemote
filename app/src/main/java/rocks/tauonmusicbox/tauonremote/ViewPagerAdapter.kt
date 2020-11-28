@@ -16,6 +16,19 @@ class ViewPagerAdapter(supportFragmentManager: FragmentManager): FragmentPagerAd
         return mFragmentList[position]
     }
 
+    override fun getPageTitle(position: Int): CharSequence {
+        when (position) {
+            0 -> return "Welcome"
+            1 -> return "Playlists"
+            2 -> return "Albums"
+            3 -> return "Tracks"
+            4 -> return "Now Playing"
+        }
+
+        return "Test" //"OBJECT ${(position + 1)}"
+    }
+
+
     fun addFragment(fragment: Fragment){
         mFragmentList.add(fragment)
     }

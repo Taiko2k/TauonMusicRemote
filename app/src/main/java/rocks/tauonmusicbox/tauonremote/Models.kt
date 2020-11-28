@@ -7,7 +7,7 @@ class TauonStatus(
         var progress: Int,
         val playlist: String,
         var position: Int,
-        val album_id: Int,
+        var album_id: Int,
         var track: TauonTrack
 )
 
@@ -18,7 +18,8 @@ class TauonTrack(
         val album_artist: String = "",
         val duration: Int = 0,
         val id: Int = -1,
-        val position: Int = 0
+        val position: Int = 0,
+        val album_id: Int = -1
 )
 
 class TrackListData(

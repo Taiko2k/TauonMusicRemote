@@ -36,6 +36,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     fun setStreamMode(){
         if (mode != 2) {
             mode = 2
+            settings.setMode(mode)
             resetStatus()
         }
     }
@@ -43,6 +44,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     fun setRemoteMode(){
         if (mode != 1){
             mode = 1
+            settings.setMode(mode)
             resetStatus()
         }
     }
@@ -182,6 +184,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     }
 
     fun startTrack(track: TauonTrack){
+        //println("Want start track: ${track.title}")
         if (mode == 1) {
             playPosition(track.position, activePlaylistViewing)
         } else if (mode == 2) {
@@ -203,9 +206,14 @@ class Controller(val activity: MainActivity, val settings: Settings) {
             }
             activePlaylistPlaying = activePlaylistViewing
             syncTauonStatus(track)
+            if (activity.tracks.size > 0){
+                tauonStatus.album_id = activity.tracks[0].position
+            }
+
             activity.seekBar.progress = 0
+
             activity.updateStatus()
-            println("DONE play")
+            //println("DONE play")
         }
     }
 
@@ -233,10 +241,37 @@ class Controller(val activity: MainActivity, val settings: Settings) {
             next()
         }
     }
+    fun backButtonClick(){
+        if (mode == 1){
+            backSend()
+        } else if (mode == 2) {
+            back()
+        }
+    }
 
-    fun next(){
+    fun backSend(){
+        hitApi("back")
+        activity.fetchStatus()
+    }
+
+
+    fun back() {
+        tauonStatus.position -= 1
+        if (tauonStatus.position < 0) {
+            tauonStatus.position = 0
+            Toast.makeText(activity, "Already at start of playlist!", Toast.LENGTH_SHORT).show()
+        }
+        startByPosition()
+    }
+
+
+    fun next() {
         tauonStatus.position += 1
-        var newTrack = TauonTrack()
+        startByPosition()
+    }
+
+    fun startByPosition(){
+        var newTrack: TauonTrack
         val base_url = "http:///${settings.ip_address}:7814/api1/trackposition/$activePlaylistPlaying/${tauonStatus.position}"
         val request = Request.Builder().url(base_url).build()
         val client = OkHttpClient()
@@ -249,13 +284,10 @@ class Controller(val activity: MainActivity, val settings: Settings) {
             override fun onResponse(call: Call, response: Response) {
                 val body = response.body?.string()
                 response.body?.close()
-                println("Got request track")
-                println(body)
-
                 val gson = GsonBuilder().create()
 
                 activity.runOnUiThread {
-                    println("NEXT TRACK...")
+                    //println("NEXT TRACK...")
                     newTrack = gson.fromJson(body, TauonTrack::class.java)
                     tauonStatus.status = "playing"
                     startTrack(newTrack)
@@ -301,7 +333,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
 
     fun playPosition(position: Int, playlist: String){
 
-        println("Start track")
+        //println("Start track")
         hitApi("start/${playlist}/${position}") { reload_tracks() }
 
     }
@@ -321,5 +353,6 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     fun reload_tracks(){
         activity.got_tracks = false
         activity.fetchStatus()
+
     }
 }

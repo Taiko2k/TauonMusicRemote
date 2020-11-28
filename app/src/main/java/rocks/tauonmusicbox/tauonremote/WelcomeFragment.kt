@@ -25,6 +25,9 @@ class WelcomeFragment(private val settings: Settings, val controller: Controller
         val ipEntry: EditText = view.findViewById(R.id.ipAddressText)
         val ipButton: Button = view.findViewById(R.id.setIPButton)
         val streamSwitch: Switch = view.findViewById(R.id.streamModeSwitch)
+        if (controller.mode == 2){
+            streamSwitch.isChecked = true
+        }
 
         ipEntry.setText(settings.ip_address)
         ipButton.setOnClickListener {
