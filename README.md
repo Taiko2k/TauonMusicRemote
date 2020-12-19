@@ -26,7 +26,7 @@ App development stage is in alpha and not ready for general use.
  - Consideration for tablet display sizes?
  - [Tauon API] Security? Authentication?
  
- ### How to test
+ ## How to test
  
   - The remote API is not in Tauon master yet. You will need to setup Tauon Music Box from git and checkout the `remote` branch.
   (Once you have Tauon Music Box from the "remote" branch running, no further setup is currently needed)
