@@ -3,7 +3,7 @@
 
 An attempt at making an Andorid remote controller app for the Tauon Music Box desktop app.
 
-Development stage is in alpha and not ready for general use.
+App development stage is in alpha and not ready for general use.
 
 ## Current target features / design brief
 
