@@ -1,11 +1,14 @@
 package rocks.tauonmusicbox.tauonremote
 
+class TauonVersion(var version: Int)
+
 class TauonStatus(
         var status: String,
         val shuffle: Boolean,
         val repeat: Boolean,
         var progress: Int,
         val playlist: String,
+        var playlist_length: Int,
         var position: Int,
         var album_id: Int,
         var track: TauonTrack
@@ -19,7 +22,8 @@ class TauonTrack(
         val duration: Int = 0,
         val id: Int = -1,
         val position: Int = 0,
-        val album_id: Int = -1
+        val album_id: Int = -1,
+        val track_number: String = ""
 )
 
 class TrackListData(
@@ -36,5 +40,6 @@ class AlbumData(
 
 class TauonPlaylist(
         val name: String,
-        val id: String
+        val id: String,
+        val count: Int
 )

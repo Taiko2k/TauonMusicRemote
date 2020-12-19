@@ -80,6 +80,20 @@
             />
 
         <ImageView
+            android:id="@+id/shuffleButton"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/ic_shuffle_off"
+
+            android:layout_marginBottom="6dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/backButton"
+            app:layout_constraintTop_toTopOf="@id/backButton"
+            app:layout_constraintEnd_toStartOf="@id/backButton"
+            />
+
+        <ImageView
             android:id="@+id/backButton"
             android:layout_width="45dp"
             android:layout_height="45dp"
@@ -106,6 +120,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 tools:text="Title"
+                android:layout_marginTop="2dp"
                 android:textSize="15dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -128,7 +143,7 @@
         <SeekBar
             android:id="@+id/seekBar"
             android:layout_width="0dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="4dp"
             android:layout_marginStart="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/metadataText"
@@ -139,7 +154,7 @@
             android:id="@+id/progressTime"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            tools:text = "12:43"
+            android:text="00:00"
             app:layout_constraintStart_toEndOf="@id/seekBar"
             app:layout_constraintTop_toTopOf="@id/seekBar"
             app:layout_constraintBottom_toBottomOf="@id/seekBar"

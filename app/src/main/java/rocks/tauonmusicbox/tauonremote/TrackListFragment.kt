@@ -2,14 +2,13 @@ package rocks.tauonmusicbox.tauonremote
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -23,6 +22,7 @@ class MyAdapter(private val tracks: List<TauonTrack>, private val controller: Co
     lateinit var context: Context
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val numberView: TextView = view.findViewById(R.id.lineTrackNumber)
         val textView: TextView = view.findViewById(R.id.lineTitleText)
         val artistText: TextView = view.findViewById(R.id.lineArtistText)
         val itemHolder: ConstraintLayout = view.findViewById(R.id.trackLineHolder)
@@ -69,6 +69,7 @@ class MyAdapter(private val tracks: List<TauonTrack>, private val controller: Co
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
+        viewHolder.numberView.text = tracks[position].track_number + "."
         viewHolder.textView.text = tracks[position].title
         viewHolder.artistText.text = tracks[position].artist
         viewHolder.itemView.setOnClickListener {
@@ -83,10 +84,12 @@ class MyAdapter(private val tracks: List<TauonTrack>, private val controller: Co
 
 class TrackListFragment(val tracks: List<TauonTrack>, val controller: Controller) : Fragment() {
 
+
     lateinit var adapter: MyAdapter
     var ready = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+
+    public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
     }

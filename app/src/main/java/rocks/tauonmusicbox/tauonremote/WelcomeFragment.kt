@@ -12,10 +12,6 @@ import android.widget.Toast
 
 class WelcomeFragment(private val settings: Settings, val controller: Controller, val activity: MainActivity) : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -42,6 +38,15 @@ class WelcomeFragment(private val settings: Settings, val controller: Controller
                 controller.setRemoteMode()
             }
         }
+
+        val reloadButton: Button = view.findViewById(R.id.reloadButton)
+        reloadButton.setOnClickListener {
+            activity.got_albums = false
+            activity.got_playlists = false
+            activity.got_tracks = false
+            Toast.makeText(activity, "Flushing playlist data", Toast.LENGTH_SHORT).show()
+        }
+
         return view
     }
 

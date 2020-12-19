@@ -19,9 +19,11 @@ class Controller(val activity: MainActivity, val settings: Settings) {
 
     var activePlaylistViewing: String = ""
     var activePlaylistPlaying: String = ""
+
     var mode = 1
 
     var repeat = 0
+    var shuffle = 0
     //var cachedFile: ByteString
 
     var cachedFileID = -1
@@ -29,7 +31,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     val mediaPlayer = MediaPlayer()
     val dummy_track = TauonTrack()
     var tauonStatus = TauonStatus("stopped",
-            false, false, 0, "", 0, 0, dummy_track)
+            false, false, 0, "", 0, 0, 0, dummy_track)
     var playerPaused = false
 
 
@@ -72,13 +74,31 @@ class Controller(val activity: MainActivity, val settings: Settings) {
         )
     }
 
+    fun clickShuffle() {
+
+        if (mode == 1) {
+            hitApi("shuffle")
+        }
+        toggleShuffle()
+
+    }
+    
+    fun toggleShuffle(){
+        if (shuffle == 0){
+            shuffle = 1
+            activity.shuffleButton.setBackgroundResource(R.drawable.ic_shuffle)
+        } else if (shuffle == 1) {
+            shuffle = 0
+            activity.shuffleButton.setBackgroundResource(R.drawable.ic_shuffle_off)
+        }
+    }
+    
     fun clickRepeat() {
 
         if (mode == 1) {
-            Toast.makeText(activity, "Sorry, not yet implemented for REMOTE mode", Toast.LENGTH_SHORT).show()
-        } else {
-            toggleRepeat()
+            hitApi("repeat")
         }
+        toggleRepeat()
     }
 
     fun toggleRepeat(){
@@ -86,6 +106,26 @@ class Controller(val activity: MainActivity, val settings: Settings) {
             repeat = 1
             activity.repeatButton.setBackgroundResource(R.drawable.ic_repeat)
         } else if (repeat == 1) {
+            repeat = 0
+            activity.repeatButton.setBackgroundResource(R.drawable.ic_repeat_off)
+        }
+    }
+
+    fun syncMode(){
+        //println(tauonStatus.shuffle)
+        if (tauonStatus.shuffle && shuffle == 0){
+            shuffle = 1
+            activity.shuffleButton.setBackgroundResource(R.drawable.ic_shuffle)
+        }
+        else if (!tauonStatus.shuffle && shuffle == 1){
+            shuffle = 0
+            activity.shuffleButton.setBackgroundResource(R.drawable.ic_shuffle_off)
+        }
+        if (tauonStatus.repeat && repeat == 0){
+            repeat = 1
+            activity.repeatButton.setBackgroundResource(R.drawable.ic_repeat)
+        }
+        else if (!tauonStatus.repeat && repeat == 1){
             repeat = 0
             activity.repeatButton.setBackgroundResource(R.drawable.ic_repeat_off)
         }
@@ -165,7 +205,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
 
             override fun onResponse(call: Call, response: Response) {
                 response.body?.close()
-                println("Command sent")
+                //println("Command sent")
                 //reload_tracks()
                 if (callback != null) {
                     callback()
@@ -179,6 +219,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
         tauonStatus.track = track
         tauonStatus.position = track.position
         tauonStatus.progress = 0
+
         activity.trackListFragment.update()
 
     }
@@ -211,6 +252,7 @@ class Controller(val activity: MainActivity, val settings: Settings) {
             }
 
             activity.seekBar.progress = 0
+            tauonStatus.album_id = track.album_id
 
             activity.updateStatus()
             //println("DONE play")
@@ -266,11 +308,33 @@ class Controller(val activity: MainActivity, val settings: Settings) {
 
 
     fun next() {
-        tauonStatus.position += 1
-        startByPosition()
+        var playlistLength = -1
+        for (playlist in activity.playlists){
+            if (playlist.id == activePlaylistPlaying){
+                playlistLength = playlist.count
+            }
+        }
+        if (playlistLength == -1){
+            Toast.makeText(activity, "Corruption detected - Please restart app!", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        if (shuffle == 1 && playlistLength > 0){
+            tauonStatus.position = (0 until playlistLength - 1).random()
+            startByPosition()
+        }
+        else if (tauonStatus.position + 1 >= playlistLength){
+            Toast.makeText(activity, "End of playlist reached", Toast.LENGTH_LONG).show()
+            activity.playButton.setBackgroundResource(R.drawable.ic_play_arrow)
+            resetStatus()
+        } else {
+            tauonStatus.position += 1
+            startByPosition()
+        }
     }
 
     fun startByPosition(){
+
         var newTrack: TauonTrack
         val base_url = "http:///${settings.ip_address}:7814/api1/trackposition/$activePlaylistPlaying/${tauonStatus.position}"
         val request = Request.Builder().url(base_url).build()
@@ -346,8 +410,6 @@ class Controller(val activity: MainActivity, val settings: Settings) {
     fun loadTracks(track: TauonTrack){
         // click an album to load its tracks
         activity.fetchTrackList(activePlaylistViewing, track.position, true)
-
-
     }
 
     fun reload_tracks(){

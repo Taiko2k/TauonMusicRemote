@@ -84,6 +84,18 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+        <Button
+            android:id="@+id/reloadButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reload Data"
+            app:layout_constraintTop_toBottomOf="@id/streamModeSwitch"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -12,12 +12,26 @@
 >
 
     <TextView
+        android:id="@+id/lineTrackNumber"
+        android:layout_width="wrap_content"
+        android:minWidth="25dp"
+        android:textAlignment="textEnd"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="#494949"
+        tools:text = "12." />
+
+    <TextView
         android:id="@+id/lineTitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
+        android:ellipsize="end"
+        android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/lineTrackNumber"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="songartist" />
 

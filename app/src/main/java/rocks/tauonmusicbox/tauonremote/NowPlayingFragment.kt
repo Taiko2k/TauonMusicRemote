@@ -13,12 +13,9 @@ class NowPlayingFragment(val settings: Settings, val controller: Controller) : F
     lateinit var albumArt: ImageView
     var ready = false
     val picasso = Picasso.get()
-    var loaded_album_id = -1
+    //var loaded_album_id = -1
+    var loaded_track_id = -1
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -27,7 +24,7 @@ class NowPlayingFragment(val settings: Settings, val controller: Controller) : F
 
         albumArt = view.findViewById(R.id.mainAlbumArt)
         ready = true
-        loaded_album_id = -1
+        loaded_track_id = -1
         updateMainArt()
 
         return view
@@ -35,10 +32,11 @@ class NowPlayingFragment(val settings: Settings, val controller: Controller) : F
 
     fun updateMainArt(){
         if (ready && settings.ip_address.isNotBlank()){ //&& controller.tauonStatus.album_id >= 0 && loaded_album_id != controller.tauonStatus.album_id) {
-                println("WANT LOAD ALBUM ART")
-                loaded_album_id = controller.tauonStatus.album_id
+            if (loaded_track_id != controller.tauonStatus.track.id) {
                 picasso.load("http://${settings.ip_address}:7814/api1/pic/medium/" + controller.tauonStatus.track.id)
                         .into(albumArt)
+                loaded_track_id = controller.tauonStatus.track.id
+            }
         }
     }
 

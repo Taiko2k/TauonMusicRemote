@@ -78,7 +78,7 @@ class PlaylistFragment(val items: List<TauonPlaylist>, val controller: Controlle
     var ready = false
     lateinit var adapter: PlaylistListAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
     }

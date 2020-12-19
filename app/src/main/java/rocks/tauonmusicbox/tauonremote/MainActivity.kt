@@ -1,17 +1,24 @@
+
 package rocks.tauonmusicbox.tauonremote
 
+import android.Manifest
+import android.content.ContentResolver
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
 import com.google.gson.GsonBuilder
 import okhttp3.*
 import java.io.IOException
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     val settings = Settings(this)
     val controller = Controller(this, settings)
 
-
     var got_playlists = false
     var got_albums = false
     var got_tracks = false
@@ -34,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var nextButton: ImageView
     lateinit var backButton: ImageView
     lateinit var repeatButton: ImageView
+    lateinit var shuffleButton: ImageView
     lateinit var seekBar: SeekBar
     lateinit var timeProgress: TextView
     lateinit var searchField: SearchView
@@ -71,10 +78,15 @@ class MainActivity : AppCompatActivity() {
         nextButton = findViewById(R.id.nextButton)
         backButton = findViewById(R.id.backButton)
         repeatButton = findViewById(R.id.repeatButton)
+        shuffleButton = findViewById(R.id.shuffleButton)
         timeProgress = findViewById(R.id.progressTime)
 
         repeatButton.setOnClickListener {
             controller.clickRepeat()
+        }
+
+        shuffleButton.setOnClickListener {
+            controller.clickShuffle()
         }
 
         class SeekListener(): SeekBar.OnSeekBarChangeListener {
@@ -167,6 +179,7 @@ class MainActivity : AppCompatActivity() {
                     if (alb.position >= controller.tauonStatus.position){
                         pager.setCurrentItem(2, true)
                         albumListFragment.rcview.scrollToPosition(p - 1)
+                        //albumListFragment.rcview.smoothScrollToPosition(p - 1)
                         break
                     }
                     p += 1
@@ -177,7 +190,41 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+//
+//        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+
+
     // End OnCreate -----------------------------
+    }
+
+//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+//        when (requestCode) {
+//            1 -> {
+//
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.isNotEmpty()
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // permission granted and now can proceed
+//                    mymethod() //a sample method called
+//                    Toast.makeText(this@MainActivity, "Permission got", Toast.LENGTH_SHORT).show()
+//                } else {
+//
+//                    // permission denied, boo! Disable the
+//                    // functionality that depends on this permission.
+//                    Toast.makeText(this@MainActivity, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show()
+//                }
+//                return
+//            }
+//        }
+//    }
+
+//    fun mymethod(){
+//
+//    }
+
+    override fun onAttachFragment(fragment: Fragment) {
+        println(fragment)
+        super.onAttachFragment(fragment)
     }
 
     override fun onPause() {
@@ -212,7 +259,9 @@ class MainActivity : AppCompatActivity() {
 
         //val albumText: TextView = findViewById(R.id.albumTextView)
         //albumText.text = controller.tauonStatus.track.album
-        controller.activePlaylistPlaying = controller.tauonStatus.playlist
+        if (controller.mode == 1){
+            controller.activePlaylistPlaying = controller.tauonStatus.playlist
+        }
         nowPlayingFragment.updateMainArt()
 
 
@@ -244,6 +293,7 @@ class MainActivity : AppCompatActivity() {
         //println("Attempt fetch TRACKLIST")
 
         val base_url = "http://${settings.ip_address}:7814/api1/albumtracks/$playlistId/$album_id"
+        //val base_url = "http://${settings.ip_address}:7814/api1/tracklist/$playlistId"
         val request = Request.Builder().url(base_url).build()
         val client = OkHttpClient()
         client.newCall(request).enqueue(object : Callback {
@@ -256,7 +306,7 @@ class MainActivity : AppCompatActivity() {
                 val body = response.body?.string()
                 response.body?.close()
                 //println("Got request tracks")
-                println(body)
+                //println(body)
 
 
                 val gson = GsonBuilder().create()
@@ -281,7 +331,7 @@ class MainActivity : AppCompatActivity() {
         }
         // Get albums
         //println("Attempt fetch albums")
-        println(playlistId)
+        //println(playlistId)
 
         val base_url = "http://${settings.ip_address}:7814/api1/albums/$playlistId"
         val request = Request.Builder().url(base_url).build()
@@ -296,7 +346,7 @@ class MainActivity : AppCompatActivity() {
                 val body = response.body?.string()
                 response.body?.close()
                 //println("Got request albums")
-                println(body)
+                //println(body)
 
                 val gson = GsonBuilder().create()
 
@@ -327,6 +377,9 @@ class MainActivity : AppCompatActivity() {
                     seekBar.setProgress(
                             controller.getProgress1k(),
                             false)
+                    if (controller.tauonStatus.track.id >= 0 && controller.mediaPlayer.isPlaying) {
+                        controller.hitApi("playinghit/${controller.tauonStatus.track.id}")
+                    }
                 }
             }
 
@@ -338,7 +391,7 @@ class MainActivity : AppCompatActivity() {
         // Get playlists
         if (!got_playlists) {
 
-            println("Attempt fetch playlists")
+            //println("Attempt fetch playlists")
             val base_url = "http://${settings.ip_address}:7814/api1/playlists"
             val request = Request.Builder().url(base_url).build()
             val client = OkHttpClient()
@@ -367,8 +420,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-        println("Attempt get now playing json")
+        //println("Attempt get now playing json")
         val base_url = "http://${settings.ip_address}:7814/api1/status"
         val request = Request.Builder().url(base_url).build()
         val client = OkHttpClient()
@@ -386,7 +438,9 @@ class MainActivity : AppCompatActivity() {
 
                 val gson = GsonBuilder().create()
                 controller.tauonStatus = gson.fromJson(body, controller.tauonStatus::class.java)
-                println("SET STATUS: ${controller.tauonStatus.track.title}")
+                //println("SET STATUS: ${controller.tauonStatus.track.title}")
+
+                controller.syncMode()
 
                 if (!got_albums && controller.tauonStatus.playlist.isNotEmpty()) {
                     fetchAlbums(controller.tauonStatus.playlist)
@@ -395,7 +449,7 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 if (!got_tracks) {
-                    println("FETCH TRACKS")
+                    //println("FETCH TRACKS")
                     fetchTrackList(controller.tauonStatus.playlist, controller.tauonStatus.album_id)
                     got_tracks = true
                 }

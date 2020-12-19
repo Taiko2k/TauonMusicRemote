@@ -136,7 +136,7 @@ class AlbumListFragment(val items: List<TauonTrack>, val controller: Controller,
     lateinit var searchField: SearchView
     lateinit var rcview: RecyclerView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    public override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
