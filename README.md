@@ -28,7 +28,6 @@ App development stage is in alpha and not ready for general use.
  
  ## How to test
  
-  - The remote API is not in Tauon master yet. You will need to setup Tauon Music Box from git and checkout the `remote` branch.
-  (Once you have Tauon Music Box from the "remote" branch running, no further setup is currently needed)
+  - You will need to be using Tauon Music Box v6.4.5 or greater. Enable the setting "Enable server for remote app" in Settings > Function > Page 4.
 
 
