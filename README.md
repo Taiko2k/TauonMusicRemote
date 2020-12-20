@@ -19,11 +19,11 @@ App development stage is in alpha and not ready for general use.
 
 ## Issues / Work needed
 
- - [Major architectural issue] The app was initally designed around a model in which data
- structures could be shared amoung views. This turns out not to be suitalbe for Android. Views need to be
- made "lifecycle" compatible. (You can see the issue specifically when you rotate your device screen,
- the app will crash)
+ - [Architectural rewrite needed]
+    - Move UI data to ViewModel/Livedata
+    - Move audio playback to service?
  - Consideration for tablet display sizes?
+ - Export playback control notification widget?
  - [Tauon API] Security? Authentication?
  
  ## How to test
