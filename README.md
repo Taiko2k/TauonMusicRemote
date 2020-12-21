@@ -7,8 +7,8 @@ An attempt at making an Andorid remote controller app for [Tauon Music Box](http
 
 ## Current target features / design brief
 
- - There are two modes of opperation, **remote control** and **streaming**. 
- - Multiple view are presented, **playlists**, **albums**, **tracks** and **now playing**.
+ - There are two modes of opperation: **remote control** and **streaming**. 
+ - Multiple view are presented: **playlists**, **albums**, **tracks** and **now playing**.
 
 ## Issues / Work needed
 
