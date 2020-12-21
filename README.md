@@ -31,7 +31,7 @@ An attempt at making an Andorid remote controller app for [Tauon Music Box](http
 ## How to use
 
 - See releases section for an APK.
-- You will need to be using Tauon Music Box v6.4.5 or greater. Enable the setting "Enable server for remote app" in Settings > Function > Page 4.
+- You will need to be using Tauon Music Box **v6.4.5** or greater. Enable the setting "Enable server for remote app" in Settings > Function > Page 4.
 - Find your PC's local IP address (try `ip a`) and enter in app. Then if both apps are running you should see the app populated with content.
 
 ### Tips
