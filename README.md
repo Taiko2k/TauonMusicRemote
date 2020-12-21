@@ -35,7 +35,8 @@ App is currently alpha quality, but you may find it useful.
 
 ## How to use
 
-- Enable setting in TMB as above
+- See releases section for an APK.
+- Enable setting in TMB as above.
 - Find your PC's local IP address (try `ip a`) and enter in app. Then if both apps are running you should see the app populated with content.
 
 ## Tips
