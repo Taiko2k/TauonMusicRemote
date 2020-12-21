@@ -1,9 +1,7 @@
 
 # Tauon Music Remote
 
-An attempt at making an Andorid remote controller app for [Tauon Music Box](https://github.com/Taiko2k/TauonMusicBox).
-
-App is currently alpha quality, but you may find it useful.
+An attempt at making an Andorid remote controller app for [Tauon Music Box](https://github.com/Taiko2k/TauonMusicBox). Its currently alpha quality, but you may find it useful.
 
 <img width="200" src="https://user-images.githubusercontent.com/17271572/102763775-070d1d00-43df-11eb-8df6-b4dd4c854f31.jpg">
 
