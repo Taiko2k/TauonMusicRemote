@@ -10,16 +10,7 @@ An attempt at making an Andorid remote controller app for [Tauon Music Box](http
  - There are two modes of opperation: **remote control** and **streaming**. 
  - Multiple view are presented: **playlists**, **albums**, **tracks** and **now playing**.
 
-### Issues / Work needed
 
- - [Architectural rewrite needed]
-    - Move UI data to ViewModel/Livedata
-    - Move audio playback to service?
- - Reload data when server data chagnes
- - Consideration for tablet display sizes?
- - Export playback control notification widget?
- - [Tauon API] Security? Authentication?
- - [Tauon API] Advanced search? Playlist generation?
  
  
 ### Possible future goals
@@ -30,10 +21,29 @@ An attempt at making an Andorid remote controller app for [Tauon Music Box](http
 
 ## How to use
 
-- See releases section for an APK.
+- Download and install the latest Tauon Music Remote [APK v0.5](https://github.com/Taiko2k/TauonMusicRemote/releases/download/0.5/TauonMusicRemoteAlpha5.apk).
 - In Tauon Music Box, Enable the setting "Enable server for remote app" in Settings > Function > Page 4.
 - Find your PC's local IP address (try `ip a`) and enter in app. Then if both apps are running you should see Tauon Music Remote then populated with content.
 
-### Tips
+### Tip
 
 - Tap the track title at the bottom of the screen to "go to playing".
+
+___
+
+
+## Known issues
+
+ - App will crash when screen is rotated
+ - Need to restart app if playlist changes were made on server
+
+### Work needed
+
+ - [Architectural rewrite needed]
+    - Move UI data to ViewModel/Livedata
+    - Move audio playback to service?
+ - Reload data when server data chagnes
+ - Consideration for tablet display sizes?
+ - Export playback control notification widget?
+ - [Tauon API] Security? Authentication?
+ - [Tauon API] Advanced search? Playlist generation?
