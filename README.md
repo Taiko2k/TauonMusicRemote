@@ -1,3 +1,7 @@
+This app is no longer actively maintained. 
+
+___
+
 
 # Tauon Music Remote
 
