@@ -1,4 +1,6 @@
-This app is no longer actively maintained. 
+**This app is no longer actively maintained.**
+
+You may want to look at the [Tauon Remote Android](https://github.com/sultannamja/tauonremote_android) project instead.
 
 ___
 
